@@ -172,6 +172,8 @@ func add_sight_polygon(sight : Vector2):
 		if prev_hit!=null:
 			add_tri( sight, prev_hit, i.hit )
 		prev_hit = i.hit
+	if len(intersects)>2:
+		add_tri(sight, prev_hit, intersects[0].hit)
 
 func vec3(v:Vector2, z:float) -> Vector3:
 	return Vector3(v.x, v.y, z)
