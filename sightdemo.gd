@@ -102,16 +102,6 @@ func get_intersect( p1:Vector2, p2:Vector2, p3:Vector2, p4:Vector2 ) -> RayHit:
 	return RayHit.new( result.x, result.y, result.distance_to( p1 ) )
 
 
-class Polygon:
-	var points : PoolVector2Array
-	var colors : PoolColorArray	
-
-	func _init( vlist, color ):
-		self.points = PoolVector2Array(vlist)
-		self.colors = PoolColorArray()
-		for x in vlist:
-			self.colors.append( color )
-
 class SegHit:
 	var start: Vector2
 	var hit: Vector2
@@ -130,6 +120,7 @@ func sort_seg_hit( a : SegHit, b :SegHit ) -> bool:
 
 var visible_triangles = PoolVector3Array()
 var visible_coords =    PoolVector2Array()
+var triangle_colors =   PoolColorArray()
 
 var screen_size = Vector2(840, 360)
 
@@ -138,12 +129,13 @@ func add_uv(v):
 	var sy = v.y / screen_size.y
 	visible_coords.append(Vector2(sx,sy))
 
-func add_tri( v1, v2, v3 ):
+func add_tri( v1:Vector2, v2:Vector2, v3:Vector2, col:Color ):
 	for it in [v1, v2, v3]:
 		add_uv(it)
+		triangle_colors.append( col )
 		visible_triangles.append( vec3(it, 0) )
 
-func add_sight_polygon(sight : Vector2):
+func add_sight_polygon(sight : Vector2, col : Color):
 	var unique_angles = []
 	for p in unique_points:
 		var v = p.point
@@ -170,10 +162,10 @@ func add_sight_polygon(sight : Vector2):
 	var prev_hit = null
 	for i in intersects:
 		if prev_hit!=null:
-			add_tri( sight, prev_hit, i.hit )
+			add_tri( sight, prev_hit, i.hit, col )
 		prev_hit = i.hit
 	if len(intersects)>2:
-		add_tri(sight, prev_hit, intersects[0].hit)
+		add_tri(sight, prev_hit, intersects[0].hit, col)
 
 func vec3(v:Vector2, z:float) -> Vector3:
 	return Vector3(v.x, v.y, z)
@@ -189,22 +181,30 @@ func rebuild_mesh():
 	assert len(visible_triangles)%3 == 0
 	var n = 0
 	for v in visible_triangles:
+		var col = triangle_colors[n]
 		var c = visible_coords[n]
 		n += 1
+		st.add_color( col )
 		st.add_uv( c )
 		st.add_vertex( v )
 	st.commit(poly_mesh)
 	
 
+const translucent = Color(1.0, 1.0, 1.0, 0.2 )
+const delta = PI / 5.0;
+
 func _draw():
 	draw_circle( mouse_pos, 5, Color.yellow )	
 	visible_triangles.resize(0)
 	visible_coords.resize(0)
-	add_sight_polygon( mouse_pos )
+	triangle_colors.resize(0)
+	add_sight_polygon( mouse_pos, Color.black )
 	var fuzzy_radius = 4
-	for a in range(0, PI*2, PI*2 / 10):
+	var a = 0
+	while a <= PI*2.0:
 		var rpos = mouse_pos + ( Vector2( cos(a), sin(a) ) * fuzzy_radius )
-		add_sight_polygon( rpos )
+		a += delta
+		add_sight_polygon( rpos, translucent )
 	rebuild_mesh()
 	for w in walls:
 		var d = (w.b - w.a).angle_to( w.a - mouse_pos )

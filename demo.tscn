@@ -2,24 +2,13 @@
 
 [ext_resource path="res://sightdemo.gd" type="Script" id=1]
 [ext_resource path="res://foreground.png" type="Texture" id=2]
-[ext_resource path="res://background.png" type="Texture" id=3]
+[ext_resource path="res://demo.shader" type="Shader" id=3]
+[ext_resource path="res://background.png" type="Texture" id=4]
 
-[sub_resource type="Shader" id=1]
-code = "shader_type canvas_item;
-render_mode blend_mix;
-
-uniform vec2 screen_size;
-
-uniform sampler2D fg_tex ;
-
-void fragment() {
-	COLOR = vec4( texture( fg_tex, UV).rgb , 1 );
-}"
-
-[sub_resource type="ShaderMaterial" id=2]
-shader = SubResource( 1 )
+[sub_resource type="ShaderMaterial" id=1]
+shader = ExtResource( 3 )
 shader_param/screen_size = null
-shader_param/fg_tex = ExtResource( 3 )
+shader_param/fg_tex = ExtResource( 4 )
 
 [node name="Demo" type="Node2D"]
 position = Vector2( 0, 1 )
@@ -36,5 +25,4 @@ margin_bottom = 360.0
 texture = ExtResource( 2 )
 
 [node name="MeshInstance2D" type="MeshInstance2D" parent="Control"]
-show_behind_parent = true
-material = SubResource( 2 )
+material = SubResource( 1 )
