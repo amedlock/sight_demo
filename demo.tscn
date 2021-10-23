@@ -23,6 +23,9 @@ show_behind_parent = true
 margin_right = 840.0
 margin_bottom = 360.0
 texture = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="MeshInstance2D" type="MeshInstance2D" parent="Control"]
 material = SubResource( 1 )

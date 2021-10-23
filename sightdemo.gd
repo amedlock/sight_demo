@@ -108,10 +108,10 @@ class SegHit:
 	var dist: float
 	var angle: float
 
-	func _init(start, hit, dist):
-		self.start = start
-		self.hit = hit
-		self.dist = dist
+	func _init(_start, _hit, _dist):
+		self.start = _start
+		self.hit = _hit
+		self.dist = _dist
 		self.angle = (hit-start).angle_to(Vector2(0,1))
 
 
@@ -178,7 +178,7 @@ func rebuild_mesh():
 		poly_mesh.surface_remove(0)
 	var st = SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
-	assert len(visible_triangles)%3 == 0
+	assert(len(visible_triangles)%3 == 0)
 	var n = 0
 	for v in visible_triangles:
 		var col = triangle_colors[n]
